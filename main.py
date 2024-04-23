@@ -13,6 +13,8 @@ class WinState(Enum):
 win_state = WinState.NONE
 
 square_size: int = 400
+half_square = square_size // 2
+
 resolution: tuple[int, int] = (square_size * 3, square_size * 3)
 text_pos: tuple[int, int] = (600, 600)
 
@@ -35,7 +37,10 @@ x_surface = font_big.render("X", True, (255, 255, 255))
 o_surface = font_big.render("O", True, (255, 255, 255))
 
 
-def center_surface(surf: pygame.Surface, center: tuple[int, int]) -> tuple[int, int]:
+def center_surface(
+        surf: pygame.Surface,
+        center: tuple[int, int]
+        ) -> tuple[int, int]:
     surf_size = surf.get_size()
     pos_x = center[0] - (surf_size[0] // 2)
     pos_y = center[1] - (surf_size[1] // 2)
@@ -84,16 +89,16 @@ while running:
             if not game_over:
                 for i, _square in enumerate(squares):
                     mouse_pos = pygame.mouse.get_pos()
-                    if _square.collidepoint(mouse_pos) and not (i in total_moves):
+
+                    if (_square.collidepoint(mouse_pos) and
+                            i not in total_moves):
+
                         total_moves.append(i)
-                        # print(f"Collided at: {i}")
 
                         if is_x_turn:
                             x_moves.append(i)
-                            # print(f"x's turn: {x_moves}")
                         else:
                             o_moves.append(i)
-                            # print(f"o's turn: {o_moves}")
 
                         for cond in win_conditions:
                             if is_x_turn:
@@ -131,29 +136,19 @@ while running:
     # RENDER GAME HERE
     for i, square in enumerate(squares):
         col = background_color
-        square_center = (square[0] + square_size // 2, square[1] + square_size // 2)
+        square_center = (square[0] + half_square, square[1] + half_square)
         if not game_over:
             if i in x_moves:
-                # col = (0, 127, 127)
-                # pygame.draw.rect(screen, (0, 0, 0), square)
                 text_center = center_surface(x_surface, square_center)
                 screen.blit(x_surface, text_center)
             elif i in o_moves:
-                # col = (127, 127, 0)
-                # pygame.draw.rect(screen, (0, 0, 0), square)
                 text_center = center_surface(o_surface, square_center)
                 screen.blit(o_surface, text_center)
 
         if i in x_moves:
             col = (0, 127, 127)
-            # pygame.draw.rect(screen, (0, 0, 0), square)
-            # text_center = center_surface(x_surface, square_center)
-            # screen.blit(x_surface, text_center)
         elif i in o_moves:
             col = (127, 127, 0)
-            # pygame.draw.rect(screen, (0, 0, 0), square)
-            # text_center = center_surface(o_surface, square_center)
-            # screen.blit(o_surface, text_center)
 
         pygame.draw.rect(screen, col, square, 10)
 
